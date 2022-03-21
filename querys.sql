@@ -157,3 +157,19 @@
       s1 group by mes order by monto asc)
   s2 where ROWNUM <= 1;
 )
+
+-- Consulta 10
+(
+  select 
+    id_producto, 
+    nombre_producto, 
+    sum(monto) as monto from (
+      select 
+        orden.id_producto, 
+        p.nombre_producto, 
+        (cantidad*p.precio) as monto from orden
+      inner join producto p on p.id_producto = orden.id_producto
+      inner join categoria c on c.id_categoria = p.id_categoria
+      where nombre_categoria = 'Deportes') s1
+  group by s1.id_producto, s1.nombre_producto;
+)
