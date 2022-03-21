@@ -1,24 +1,121 @@
 -- Consulta 1
-select
-  s3.id_cliente,
-  c.nombre,
-  c.apellido,
-  pa.nombre_pais,
-  s3.monto_total from
-  ( select * from (
-    select 
-    id_cliente,
-    sum(monto_total) as monto_total from (
+(
+  select
+    s3.id_cliente,
+    c.nombre,
+    c.apellido,
+    pa.nombre_pais,
+    s3.monto_total from
+    ( select * from (
       select 
-      orden.id_cliente, 
-      (p.precio * orden.cantidad) as monto_total from 
+      id_cliente,
+      sum(monto_total) as monto_total from (
+        select 
+        orden.id_cliente, 
+        (p.precio * orden.cantidad) as monto_total from 
+        orden
+        inner join producto p on p.id_producto = orden.id_producto
+      ) sub1
+        group by sub1.id_cliente
+    ) sub2
+          order by sub2.monto_total desc
+    ) s3
+  inner join cliente c on c.id_cliente = s3.id_cliente
+  inner join pais pa on c.id_pais = pa.id_pais
+  where ROWNUM <= 1;
+)
+
+
+-- Consulta 2
+(
+  select 
+    s1.id_producto,
+    p.nombre_producto,
+    c.nombre_categoria,
+    s1.unidades,
+    (s1.unidades * p.precio) as monto_vendido
+    from (
+    select 
+    id_producto, 
+    sum(cantidad) as unidades from 
       orden
-      inner join producto p on p.id_producto = orden.id_producto
-    ) sub1
-      group by sub1.id_cliente
-  ) sub2
-        order by sub2.monto_total desc
-  ) s3
-inner join cliente c on c.id_cliente = s3.id_cliente
-inner join pais pa on c.id_pais = pa.id_pais
-where ROWNUM <= 1;
+    group by id_producto order by unidades desc
+  ) s1
+  inner join producto p on p.id_producto = s1.id_producto
+  inner join categoria c on c.id_categoria = p.id_categoria
+  where ROWNUM <= 1
+    union
+  select 
+    s1.id_producto,
+    p.nombre_producto,
+    c.nombre_categoria,
+    s1.unidades,
+    (s1.unidades * p.precio) as monto_vendido
+    from (
+    select 
+    id_producto, 
+    sum(cantidad) as unidades from 
+      orden
+    group by id_producto order by unidades asc
+  ) s1
+  inner join producto p on p.id_producto = s1.id_producto
+  inner join categoria c on c.id_categoria = p.id_categoria
+  where ROWNUM <= 1;
+)
+
+-- Consulta 3
+(
+  select * from 
+    (select 
+    id_vendedor, 
+    nombre_vendedor, 
+    sum(monto_vendido) as monto_vendido from 
+    (select 
+      orden.id_vendedor, 
+      v.nombre_vendedor,
+      (cantidad*p.precio) as monto_vendido from orden 
+    inner join producto p on p.id_producto = orden.id_producto
+    inner join vendedor v on v.id_vendedor = orden.id_vendedor) s1
+    group by s1.id_vendedor, s1.nombre_vendedor) s2 
+  where ROWNUM <= 1;
+)
+
+-- Consulta 4
+(
+  select * from (select * from (select
+    s1.id_pais, 
+    s1.nombre_pais, 
+    sum(total) as monto from (
+      select 
+      pa.id_pais, 
+      pa.nombre_pais, 
+      (cantidad*p.precio) as total from orden
+  inner join producto p on p.id_producto = orden.id_producto
+  inner join vendedor v on v.id_vendedor = orden.id_vendedor
+  inner join pais pa on pa.id_pais = v.id_pais)
+  s1 group by s1.id_pais, s1.nombre_pais)
+  s2 order by s2.monto desc) s3 where ROWNUM <= 1;
+)
+
+-- Consulta 5
+(
+  select * from (select * from (select * from (select
+    s1.id_pais, 
+    s1.nombre_pais, 
+    sum(total) as monto from (
+      select 
+      pa.id_pais, 
+      pa.nombre_pais, 
+      (cantidad*p.precio) as total from orden
+  inner join producto p on p.id_producto = orden.id_producto
+  inner join vendedor v on v.id_vendedor = orden.id_vendedor
+  inner join pais pa on pa.id_pais = v.id_pais)
+  s1 group by s1.id_pais, s1.nombre_pais)
+  s2 order by s2.monto desc) s3 where ROWNUM <= 5) s3
+  order by s3.monto asc;
+)
+
+-- Consulta 6
+-- Consulta 7
+
+-- Consulta 8
