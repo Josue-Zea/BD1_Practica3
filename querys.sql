@@ -119,3 +119,17 @@
 -- Consulta 7
 
 -- Consulta 8
+(
+  select * from (
+    select 
+    mes, 
+    sum(monto) as monto from (
+      select extract(month from fecha_orden) as mes, 
+      pa.nombre_pais, 
+      (cantidad*p.precio) as monto from orden
+  inner join producto p on p.id_producto = orden.id_producto
+  inner join vendedor v on v.id_vendedor = orden.id_vendedor
+  inner join pais pa on pa.id_pais = v.id_pais
+  where nombre_pais = 'Inglaterra') s1 
+  group by s1.mes, s1.nombre_pais) s2 order by s2.mes;
+)
