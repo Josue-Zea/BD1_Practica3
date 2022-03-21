@@ -133,3 +133,27 @@
   where nombre_pais = 'Inglaterra') s1 
   group by s1.mes, s1.nombre_pais) s2 order by s2.mes;
 )
+
+-- Consulta 9
+(
+  select * from (
+    select 
+      mes, 
+      sum(monto) as monto from (
+        select 
+          extract(month from fecha_orden) as mes, 
+          (cantidad*p.precio) as monto from orden
+        inner join producto p on p.id_producto = orden.id_producto)
+      s1 group by mes order by monto desc)
+  s2 where ROWNUM <= 1 union 
+  select * from (
+    select 
+      mes, 
+      sum(monto) as monto from (
+        select 
+          extract(month from fecha_orden) as mes, 
+          (cantidad*p.precio) as monto from orden
+        inner join producto p on p.id_producto = orden.id_producto)
+      s1 group by mes order by monto asc)
+  s2 where ROWNUM <= 1;
+)
