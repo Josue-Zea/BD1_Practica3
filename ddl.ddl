@@ -1,6 +1,6 @@
 CREATE TABLE categoria (
-    id_categoria    INTEGER NOT NULL PRIMARY KEY,
-    nombrecategoria VARCHAR(150) NOT NULL
+    id_categoria     INTEGER NOT NULL PRIMARY KEY,
+    nombre_categoria VARCHAR(150) NOT NULL
 );
 
 CREATE TABLE producto (
@@ -12,8 +12,8 @@ CREATE TABLE producto (
 );
 
 CREATE TABLE pais (
-    id_pais    INTEGER NOT NULL PRIMARY KEY,
-    nombrepais VARCHAR(150) NOT NULL
+    id_pais     INTEGER NOT NULL PRIMARY KEY,
+    nombre_pais VARCHAR(150) NOT NULL
 );
 
 CREATE TABLE cliente (
@@ -31,19 +31,20 @@ CREATE TABLE cliente (
 );
 
 CREATE TABLE vendedor (
-    id_vendedor    INTEGER NOT NULL PRIMARY KEY,
-    nombrevendedor VARCHAR(150) NOT NULL,
-    id_pais   INTEGER NOT NULL
+    id_vendedor     INTEGER NOT NULL PRIMARY KEY,
+    nombre_vendedor VARCHAR(150) NOT NULL,
+    id_pais         INTEGER NOT NULL
 );
 
 CREATE TABLE orden (
-    id_orden             INTEGER NOT NULL PRIMARY KEY,
+    id_orden             INTEGER NOT NULL,
     linea_orden          INTEGER NOT NULL,
     fecha_orden          DATE NOT NULL,
     id_cliente           INTEGER NOT NULL,
     id_vendedor          INTEGER NOT NULL,
     id_producto          INTEGER NOT NULL,
     cantidad             INTEGER NOT NULL,
+    CONSTRAINT PK_Orden  PRIMARY KEY (id_orden, linea_orden),
     FOREIGN KEY (id_producto) REFERENCES producto (id_producto),
     FOREIGN KEY (id_cliente) REFERENCES cliente (id_cliente),
     FOREIGN KEY (id_vendedor) REFERENCES vendedor (id_vendedor)
