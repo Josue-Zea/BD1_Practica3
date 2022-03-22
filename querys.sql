@@ -25,7 +25,6 @@
   where ROWNUM <= 1;
 )
 
-
 -- Consulta 2
 (
   select 
@@ -116,6 +115,23 @@
 )
 
 -- Consulta 6
+select * from (
+  select 
+    c.nombre_categoria, 
+    sum(orden.cantidad) as unidades_vendidas from orden
+  inner join producto p on p.id_producto = orden.id_producto
+  inner join categoria c on c.id_categoria = p.id_categoria
+  group by c.nombre_categoria order by unidades_vendidas desc) s1
+where rownum <=1 union 
+select * from (
+  select 
+    c.nombre_categoria, 
+    sum(orden.cantidad) as unidades_vendidas from orden
+  inner join producto p on p.id_producto = orden.id_producto
+  inner join categoria c on c.id_categoria = p.id_categoria
+  group by c.nombre_categoria order by unidades_vendidas asc) s1
+where rownum <=1;
+
 -- Consulta 7
 
 -- Consulta 8
