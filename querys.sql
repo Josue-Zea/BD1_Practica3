@@ -155,6 +155,34 @@
 )
 
 -- Consulta 7
+(
+  select 
+    s3.nombre_pais, 
+    s3.nombre_categoria, 
+    s3.unidades from (
+      select 
+        nombre_pais, 
+        max(unidades) as unidades from (
+          select 
+            pa.nombre_pais, 
+            c.nombre_categoria, 
+            sum(cantidad) as unidades from orden
+          inner join vendedor v on v.id_vendedor = orden.id_vendedor
+          inner join pais pa on pa.id_pais = v.id_pais
+          inner join producto p on p.id_producto = orden.id_producto
+          inner join categoria c on c.id_categoria = p.id_categoria group by pa.nombre_pais, c.nombre_categoria
+        ) s1 group by nombre_pais
+    ) s2 join 
+    (select 
+      pa.nombre_pais, 
+      c.nombre_categoria, 
+      sum(cantidad) as unidades from orden
+    inner join vendedor v on v.id_vendedor = orden.id_vendedor
+    inner join pais pa on pa.id_pais = v.id_pais
+    inner join producto p on p.id_producto = orden.id_producto
+    inner join categoria c on c.id_categoria = p.id_categoria group by pa.nombre_pais, c.nombre_categoria
+  ) s3 on s2.nombre_pais = s3.nombre_pais and s2.unidades = s3.unidades;
+)
 
 -- Consulta 8
 (
