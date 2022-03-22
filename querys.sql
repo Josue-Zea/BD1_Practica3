@@ -25,7 +25,7 @@
   where ROWNUM <= 1;
 )
 
--- Consulta 2 verificada
+-- Consulta 2
 (
   select * from (
     select * from (
@@ -68,7 +68,7 @@
   ) s3 where rownum <=1;
 )
 
--- Consulta 3 verificada
+-- Consulta 3
 (
   select * from (
     select * from (
@@ -87,7 +87,7 @@
   ) s3 where rownum <= 1;
 )
 
--- Consulta 4 verificada
+-- Consulta 4
 (
   select * from (
     select 
@@ -224,7 +224,7 @@
   s2 where ROWNUM <= 1;
 )
 
--- Consulta 10 verificada
+-- Consulta 10
 (
   select 
     id_producto, 
