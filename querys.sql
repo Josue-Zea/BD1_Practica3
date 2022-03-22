@@ -25,7 +25,7 @@
   where ROWNUM <= 1;
 )
 
--- Consulta 2
+-- Consulta 2 verificar
 (
   select 
     s1.id_producto,
@@ -62,7 +62,7 @@
   where ROWNUM <= 1;
 )
 
--- Consulta 3
+-- Consulta 3 verificar
 (
   select * from 
     (select 
@@ -79,7 +79,7 @@
   where ROWNUM <= 1;
 )
 
--- Consulta 4
+-- Consulta 4 verificar
 (
   select * from (select * from (select
     s1.id_pais, 
@@ -93,7 +93,21 @@
   inner join vendedor v on v.id_vendedor = orden.id_vendedor
   inner join pais pa on pa.id_pais = v.id_pais)
   s1 group by s1.id_pais, s1.nombre_pais)
-  s2 order by s2.monto desc) s3 where ROWNUM <= 1;
+  s2 order by s2.monto desc) s3 where ROWNUM <= 1
+  union 
+    select * from (select * from (select
+    s1.id_pais, 
+    s1.nombre_pais, 
+    sum(total) as monto from (
+      select 
+      pa.id_pais, 
+      pa.nombre_pais, 
+      (cantidad*p.precio) as total from orden
+  inner join producto p on p.id_producto = orden.id_producto
+  inner join vendedor v on v.id_vendedor = orden.id_vendedor
+  inner join pais pa on pa.id_pais = v.id_pais)
+  s1 group by s1.id_pais, s1.nombre_pais)
+  s2 order by s2.monto asc) s3 where ROWNUM <= 1;
 )
 
 -- Consulta 5
@@ -115,22 +129,24 @@
 )
 
 -- Consulta 6
-select * from (
-  select 
-    c.nombre_categoria, 
-    sum(orden.cantidad) as unidades_vendidas from orden
-  inner join producto p on p.id_producto = orden.id_producto
-  inner join categoria c on c.id_categoria = p.id_categoria
-  group by c.nombre_categoria order by unidades_vendidas desc) s1
-where rownum <=1 union 
-select * from (
-  select 
-    c.nombre_categoria, 
-    sum(orden.cantidad) as unidades_vendidas from orden
-  inner join producto p on p.id_producto = orden.id_producto
-  inner join categoria c on c.id_categoria = p.id_categoria
-  group by c.nombre_categoria order by unidades_vendidas asc) s1
-where rownum <=1;
+(
+  select * from (
+    select 
+      c.nombre_categoria, 
+      sum(orden.cantidad) as unidades_vendidas from orden
+    inner join producto p on p.id_producto = orden.id_producto
+    inner join categoria c on c.id_categoria = p.id_categoria
+    group by c.nombre_categoria order by unidades_vendidas desc) s1
+  where rownum <=1 union 
+  select * from (
+    select 
+      c.nombre_categoria, 
+      sum(orden.cantidad) as unidades_vendidas from orden
+    inner join producto p on p.id_producto = orden.id_producto
+    inner join categoria c on c.id_categoria = p.id_categoria
+    group by c.nombre_categoria order by unidades_vendidas asc) s1
+  where rownum <=1;
+)
 
 -- Consulta 7
 
@@ -174,7 +190,7 @@ where rownum <=1;
   s2 where ROWNUM <= 1;
 )
 
--- Consulta 10
+-- Consulta 10 verificar
 (
   select 
     id_producto, 
