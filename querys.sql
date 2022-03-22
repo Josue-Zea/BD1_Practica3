@@ -25,89 +25,95 @@
   where ROWNUM <= 1;
 )
 
--- Consulta 2 verificar
+-- Consulta 2 verificada
 (
-  select 
-    s1.id_producto,
-    p.nombre_producto,
-    c.nombre_categoria,
-    s1.unidades,
-    (s1.unidades * p.precio) as monto_vendido
-    from (
-    select 
-    id_producto, 
-    sum(cantidad) as unidades from 
-      orden
-    group by id_producto order by unidades desc
-  ) s1
-  inner join producto p on p.id_producto = s1.id_producto
-  inner join categoria c on c.id_categoria = p.id_categoria
-  where ROWNUM <= 1
-    union
-  select 
-    s1.id_producto,
-    p.nombre_producto,
-    c.nombre_categoria,
-    s1.unidades,
-    (s1.unidades * p.precio) as monto_vendido
-    from (
-    select 
-    id_producto, 
-    sum(cantidad) as unidades from 
-      orden
-    group by id_producto order by unidades asc
-  ) s1
-  inner join producto p on p.id_producto = s1.id_producto
-  inner join categoria c on c.id_categoria = p.id_categoria
-  where ROWNUM <= 1;
-)
-
--- Consulta 3 verificar
-(
-  select * from 
-    (select 
-    id_vendedor, 
-    nombre_vendedor, 
-    sum(monto_vendido) as monto_vendido from 
-    (select 
-      orden.id_vendedor, 
-      v.nombre_vendedor,
-      (cantidad*p.precio) as monto_vendido from orden 
-    inner join producto p on p.id_producto = orden.id_producto
-    inner join vendedor v on v.id_vendedor = orden.id_vendedor) s1
-    group by s1.id_vendedor, s1.nombre_vendedor) s2 
-  where ROWNUM <= 1;
-)
-
--- Consulta 4 verificar
-(
-  select * from (select * from (select
-    s1.id_pais, 
-    s1.nombre_pais, 
-    sum(total) as monto from (
+  select * from (
+    select * from (
       select 
-      pa.id_pais, 
-      pa.nombre_pais, 
-      (cantidad*p.precio) as total from orden
-  inner join producto p on p.id_producto = orden.id_producto
-  inner join vendedor v on v.id_vendedor = orden.id_vendedor
-  inner join pais pa on pa.id_pais = v.id_pais)
-  s1 group by s1.id_pais, s1.nombre_pais)
-  s2 order by s2.monto desc) s3 where ROWNUM <= 1
+        id_producto, 
+        nombre_producto, 
+        nombre_categoria, 
+        sum(cantidad) as cantidad, 
+        sum(monto) as monto from (
+        select 
+          orden.id_producto, 
+          p.nombre_producto, 
+          c.nombre_categoria, 
+          orden.cantidad, 
+          (orden.cantidad*p.precio) as monto from orden
+          inner join producto p on p.id_producto = orden.id_producto
+          inner join categoria c on p.id_categoria = c.id_categoria
+        ) s1 group by id_producto, nombre_producto, nombre_categoria
+    ) s2 order by cantidad desc
+  ) s3 where rownum <=1
+  union
+  select * from (
+    select * from (
+      select 
+        id_producto, 
+        nombre_producto, 
+        nombre_categoria, 
+        sum(cantidad) as cantidad, 
+        sum(monto) as monto from (
+        select 
+          orden.id_producto, 
+          p.nombre_producto, 
+          c.nombre_categoria, 
+          orden.cantidad, 
+          (orden.cantidad*p.precio) as monto from orden
+          inner join producto p on p.id_producto = orden.id_producto
+          inner join categoria c on p.id_categoria = c.id_categoria
+        ) s1 group by id_producto, nombre_producto, nombre_categoria
+    ) s2 order by cantidad asc
+  ) s3 where rownum <=1;
+)
+
+-- Consulta 3 verificada
+(
+  select * from (
+    select * from (
+      select 
+        id_vendedor, 
+        nombre_vendedor, 
+        sum(monto) as monto from (
+          select 
+            orden.id_vendedor, 
+            v.nombre_vendedor, 
+            (orden.cantidad * p.precio) as monto from orden
+          inner join vendedor v on v.id_vendedor = orden.id_vendedor
+          inner join producto p on p.id_producto = orden.id_producto
+        ) s1 group by id_vendedor, nombre_vendedor
+    ) s2 order by monto desc
+  ) s3 where rownum <= 1;
+)
+
+-- Consulta 4 verificada
+(
+  select * from (
+    select 
+      nombre_pais, 
+      sum(monto) as monto from (
+        select 
+          pa.nombre_pais, 
+          (orden.cantidad*p.precio) as monto from orden
+          inner join vendedor v on v.id_vendedor = orden.id_vendedor
+          inner join pais pa on pa.id_pais = v.id_pais
+          inner join producto p on p.id_producto = orden.id_producto
+      ) s1 group by nombre_pais order by monto desc
+  ) s2 where rownum <=1
   union 
-    select * from (select * from (select
-    s1.id_pais, 
-    s1.nombre_pais, 
-    sum(total) as monto from (
-      select 
-      pa.id_pais, 
-      pa.nombre_pais, 
-      (cantidad*p.precio) as total from orden
-  inner join producto p on p.id_producto = orden.id_producto
-  inner join vendedor v on v.id_vendedor = orden.id_vendedor
-  inner join pais pa on pa.id_pais = v.id_pais)
-  s1 group by s1.id_pais, s1.nombre_pais)
-  s2 order by s2.monto asc) s3 where ROWNUM <= 1;
+  select * from (
+    select 
+      nombre_pais, 
+      sum(monto) as monto from (
+        select 
+          pa.nombre_pais, 
+          (orden.cantidad*p.precio) as monto from orden
+          inner join vendedor v on v.id_vendedor = orden.id_vendedor
+          inner join pais pa on pa.id_pais = v.id_pais
+          inner join producto p on p.id_producto = orden.id_producto
+      ) s1 group by nombre_pais order by monto asc
+  ) s2 where rownum <=1;
 )
 
 -- Consulta 5
@@ -190,7 +196,7 @@
   s2 where ROWNUM <= 1;
 )
 
--- Consulta 10 verificar
+-- Consulta 10 verificada
 (
   select 
     id_producto, 
@@ -202,6 +208,7 @@
         (cantidad*p.precio) as monto from orden
       inner join producto p on p.id_producto = orden.id_producto
       inner join categoria c on c.id_categoria = p.id_categoria
-      where nombre_categoria = 'Deportes') s1
-  group by s1.id_producto, s1.nombre_producto;
+      where c.nombre_categoria = 'Deportes'
+    ) s1 
+  group by id_producto, nombre_producto;
 )
