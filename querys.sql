@@ -118,20 +118,20 @@
 
 -- Consulta 5
 (
-  select * from (select * from (select * from (select
-    s1.id_pais, 
-    s1.nombre_pais, 
-    sum(total) as monto from (
-      select 
-      pa.id_pais, 
-      pa.nombre_pais, 
-      (cantidad*p.precio) as total from orden
-  inner join producto p on p.id_producto = orden.id_producto
-  inner join vendedor v on v.id_vendedor = orden.id_vendedor
-  inner join pais pa on pa.id_pais = v.id_pais)
-  s1 group by s1.id_pais, s1.nombre_pais)
-  s2 order by s2.monto desc) s3 where ROWNUM <= 5) s3
-  order by s3.monto asc;
+  select * from (
+    select 
+      id_pais, 
+      nombre_pais, 
+      sum(monto) as monto from (
+        select 
+          pa.id_pais, 
+          pa.nombre_pais, 
+          (p.precio*orden.cantidad) as monto from orden
+        inner join producto p on p.id_producto = orden.id_producto
+        inner join cliente c on c.id_cliente = orden.id_cliente
+        inner join pais pa on pa.id_pais = c.id_pais
+      ) s1 group by id_pais, nombre_pais order by monto desc
+  ) s2 where rownum <=5 order by monto asc;
 )
 
 -- Consulta 6
